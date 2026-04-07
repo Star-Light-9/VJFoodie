@@ -4,8 +4,8 @@ const FoodCard = ({ item }) => {
   const { addToCart } = useCart()
 
   return (
-    <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow overflow-hidden">
-      <div className="h-48 bg-gradient-to-br from-food-orange/20 to-food-yellow/20 flex items-center justify-center">
+    <div className="bg-white rounded-md shadow-md hover:shadow-xl transition-shadow overflow-hidden">
+      <div className="h-48 bg-gradient-to-br bg-food-surface border border-orange-100 flex items-center justify-center">
         <img
           src={item.image}
           alt={item.name}

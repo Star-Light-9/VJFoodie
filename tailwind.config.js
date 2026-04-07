@@ -7,10 +7,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        'food-orange': '#FF6B35',
-        'food-green': '#4ECDC4',
-        'food-yellow': '#FFE66D',
-        'food-dark': '#2C3E50',
+        'food-orange': '#F97316', // Deep Orange
+        'food-green': '#10B981', // Professional Emerald instead of pastel
+        'food-yellow': '#F59E0B', // Muted Amber
+        'food-dark': '#1E293B', // Dark Slate
+        'food-surface': '#F8FAFC',
+        'food-surface-alt': '#F1F5F9',
       },
     },
   },

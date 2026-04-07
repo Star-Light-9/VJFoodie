@@ -12,12 +12,12 @@ export const useCart = () => {
 
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(() => {
-    const savedCart = localStorage.getItem('canteenCart')
+    const savedCart = localStorage.getItem('vjFoodieCart')
     return savedCart ? JSON.parse(savedCart) : []
   })
 
   useEffect(() => {
-    localStorage.setItem('canteenCart', JSON.stringify(cart))
+    localStorage.setItem('vjFoodieCart', JSON.stringify(cart))
   }, [cart])
 
   const addToCart = (item) => {

@@ -1,31 +1,37 @@
 import { Link } from 'react-router-dom'
 import { menuItems } from '../data/dummyData'
 import FoodCard from '../components/FoodCard'
+import { Zap, ChefHat, Smartphone } from 'lucide-react'
 
 const Home = () => {
   const featuredItems = menuItems.slice(0, 4)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50">
+    <div className="min-h-screen bg-food-surface">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-food-orange to-orange-500 text-white py-20">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-4">Order Smart. Eat Fresh.</h1>
-          <p className="text-xl md:text-2xl mb-8 text-orange-100">
-            Your favorite canteen food, just a click away
+      <section className="bg-white border-b border-slate-200 py-24">
+        <div className="container mx-auto px-4 text-center max-w-4xl">
+          <h1 className="text-5xl md:text-6xl font-extrabold mb-6 text-food-dark tracking-tight">
+            Order Smart. Eat Fresh.
+          </h1>
+          <p className="text-xl md:text-2xl mb-10 text-slate-600 leading-relaxed">
+            Welcome to the VJFoodie platform. Experience a streamlined, efficient way to manage and track your campus meals.
           </p>
           <Link
-            to="/menu"
-            className="inline-block bg-white text-food-orange px-8 py-4 rounded-lg font-bold text-lg hover:bg-food-yellow transition-colors shadow-lg"
+             to="/menu"
+             className="inline-flex items-center justify-center bg-food-orange text-white px-8 py-4 rounded-md font-semibold text-lg hover:bg-orange-600 transition-colors shadow-sm"
           >
-            Browse Menu
+             Browse Menu
           </Link>
         </div>
       </section>
 
       {/* Featured Items */}
       <section className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-food-dark mb-8 text-center">Featured Items</h2>
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-2xl font-bold text-food-dark">Featured Choices</h2>
+          <Link to="/menu" className="text-food-orange font-medium hover:underline">View full menu &rarr;</Link>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {featuredItems.map((item) => (
             <FoodCard key={item.id} item={item} />
@@ -34,23 +40,29 @@ const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section className="bg-white py-16">
+      <section className="bg-food-surface-alt py-16 border-y border-slate-200">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center p-6 rounded-xl bg-gradient-to-br from-food-green/10 to-food-green/5">
-              <div className="text-4xl mb-4">⚡</div>
-              <h3 className="text-xl font-bold text-food-dark mb-2">Fast Ordering</h3>
-              <p className="text-gray-600">Order your favorite food in seconds</p>
+            <div className="p-8 rounded-lg bg-white shadow-sm border border-slate-200">
+              <div className="w-12 h-12 bg-orange-100 rounded-md flex items-center justify-center text-food-orange mb-6">
+                <Zap className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-food-dark mb-3">Fast Ordering</h3>
+              <p className="text-slate-600 leading-relaxed">Streamlined campus ordering process saving you valuable time between classes.</p>
             </div>
-            <div className="text-center p-6 rounded-xl bg-gradient-to-br from-food-yellow/20 to-food-yellow/10">
-              <div className="text-4xl mb-4">🍽️</div>
-              <h3 className="text-xl font-bold text-food-dark mb-2">Fresh Food</h3>
-              <p className="text-gray-600">Daily prepared with fresh ingredients</p>
+            <div className="p-8 rounded-lg bg-white shadow-sm border border-slate-200">
+              <div className="w-12 h-12 bg-emerald-100 rounded-md flex items-center justify-center text-food-green mb-6">
+                <ChefHat className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-food-dark mb-3">Fresh Preparation</h3>
+              <p className="text-slate-600 leading-relaxed">High-quality ingredients prepared fresh daily within our academic campus kitchen.</p>
             </div>
-            <div className="text-center p-6 rounded-xl bg-gradient-to-br from-food-orange/10 to-food-orange/5">
-              <div className="text-4xl mb-4">📱</div>
-              <h3 className="text-xl font-bold text-food-dark mb-2">Easy Tracking</h3>
-              <p className="text-gray-600">Track your order in real-time</p>
+            <div className="p-8 rounded-lg bg-white shadow-sm border border-slate-200">
+              <div className="w-12 h-12 bg-amber-100 rounded-md flex items-center justify-center text-food-yellow mb-6">
+                <Smartphone className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-food-dark mb-3">Digital Tracking</h3>
+              <p className="text-slate-600 leading-relaxed">Monitor your order status in real-time through our modern digital interface.</p>
             </div>
           </div>
         </div>

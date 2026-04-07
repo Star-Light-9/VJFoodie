@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Sidebar from '../../components/Sidebar'
 import { staffOrders as initialOrders } from '../../data/dummyData'
+import { ClipboardList } from 'lucide-react'
 
 const StaffOrders = () => {
   const [orders, setOrders] = useState(initialOrders)
@@ -40,15 +41,15 @@ const StaffOrders = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50">
+    <div className="flex min-h-screen bg-food-surface">
       <Sidebar />
       <div className="flex-grow p-8">
         <h1 className="text-4xl font-bold text-food-dark mb-8">Order Queue</h1>
         
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gradient-to-r from-food-orange to-orange-500 text-white">
+              <thead className="bg-food-orange text-white font-medium">
                 <tr>
                   <th className="px-6 py-4 text-left font-semibold">Order ID</th>
                   <th className="px-6 py-4 text-left font-semibold">Items</th>
@@ -72,7 +73,7 @@ const StaffOrders = () => {
                       ₹{order.total}
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(order.status)}`}>
+                      <span className={`px-3 py-1 rounded-md text-sm font-semibold ${getStatusColor(order.status)}`}>
                         {order.status}
                       </span>
                     </td>
@@ -99,8 +100,8 @@ const StaffOrders = () => {
         </div>
 
         {orders.length === 0 && (
-          <div className="bg-white rounded-xl shadow-lg p-12 text-center mt-8">
-            <div className="text-6xl mb-4">📋</div>
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-12 text-center mt-8">
+            <ClipboardList className="w-16 h-16 mx-auto text-slate-300 mb-4" />
             <h2 className="text-3xl font-bold text-food-dark mb-4">No orders</h2>
             <p className="text-gray-600">No orders in the queue at the moment.</p>
           </div>

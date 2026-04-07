@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
+import { Wallet, Smartphone, CreditCard, CheckCircle } from 'lucide-react'
 
 const Payment = () => {
   const navigate = useNavigate()
@@ -23,9 +24,9 @@ const Payment = () => {
 
   if (showSuccess) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50 flex items-center justify-center">
-        <div className="bg-white rounded-xl shadow-lg p-12 text-center max-w-md">
-          <div className="text-6xl mb-4">✅</div>
+      <div className="min-h-screen bg-food-surface flex items-center justify-center">
+        <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-12 text-center max-w-md">
+          <CheckCircle className="w-16 h-16 mx-auto text-emerald-500 mb-4" />
           <h2 className="text-3xl font-bold text-food-dark mb-4">Order Placed Successfully!</h2>
           <p className="text-gray-600">Your order is being prepared. Redirecting to orders...</p>
         </div>
@@ -34,14 +35,14 @@ const Payment = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50 py-8">
+    <div className="min-h-screen bg-food-surface py-8">
       <div className="container mx-auto px-4">
-        <h1 className="text-4xl font-bold text-food-dark mb-8">Payment 💳</h1>
+        <h1 className="text-4xl font-bold text-food-dark mb-8">Payment</h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Payment Options */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 mb-6">
               <h2 className="text-2xl font-bold text-food-dark mb-6">Select Payment Method</h2>
               
               <div className="space-y-4">
@@ -56,7 +57,7 @@ const Payment = () => {
                   />
                   <div className="flex-grow">
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl">💰</span>
+                      <Wallet className="w-6 h-6 text-slate-500" />
                       <div>
                         <p className="font-semibold text-food-dark">Wallet</p>
                         <p className="text-sm text-gray-600">Balance: ₹500</p>
@@ -76,7 +77,7 @@ const Payment = () => {
                   />
                   <div className="flex-grow">
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl">📱</span>
+                      <Smartphone className="w-6 h-6 text-slate-500" />
                       <div>
                         <p className="font-semibold text-food-dark">UPI</p>
                         <p className="text-sm text-gray-600">Pay via UPI apps</p>
@@ -96,7 +97,7 @@ const Payment = () => {
                   />
                   <div className="flex-grow">
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl">💳</span>
+                      <CreditCard className="w-6 h-6 text-slate-500" />
                       <div>
                         <p className="font-semibold text-food-dark">Card</p>
                         <p className="text-sm text-gray-600">Credit/Debit Card</p>
@@ -108,7 +109,7 @@ const Payment = () => {
             </div>
 
             {paymentMethod === 'card' && (
-              <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
                 <h3 className="text-xl font-bold text-food-dark mb-4">Card Details</h3>
                 <div className="space-y-4">
                   <input
@@ -135,7 +136,7 @@ const Payment = () => {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-lg p-6 sticky top-24">
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 sticky top-24">
               <h2 className="text-2xl font-bold text-food-dark mb-6">Order Summary</h2>
               
               <div className="space-y-2 mb-6">
@@ -164,7 +165,7 @@ const Payment = () => {
 
               <button
                 onClick={handleConfirmOrder}
-                className="w-full mt-6 bg-gradient-to-r from-food-orange to-orange-500 text-white py-4 rounded-lg font-bold text-lg hover:shadow-lg transition-shadow"
+                className="w-full mt-6 bg-food-orange text-white font-medium py-4 rounded-lg font-bold text-lg hover:shadow-lg transition-shadow"
               >
                 Confirm Order
               </button>

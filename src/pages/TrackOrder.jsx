@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { orderHistory } from '../data/dummyData'
+import { ClipboardList, ChefHat, CheckCircle, CheckCheck } from 'lucide-react'
 
 const TrackOrder = () => {
   const { orderId } = useParams()
@@ -12,10 +13,10 @@ const TrackOrder = () => {
   }
 
   const statusSteps = [
-    { id: 1, name: 'Order Placed', icon: '📝' },
-    { id: 2, name: 'Preparing', icon: '👨‍🍳' },
-    { id: 3, name: 'Ready', icon: '✅' },
-    { id: 4, name: 'Completed', icon: '🎉' },
+    { id: 1, name: 'Order Placed', icon: <ClipboardList className="w-6 h-6" /> },
+    { id: 2, name: 'Preparing', icon: <ChefHat className="w-6 h-6" /> },
+    { id: 3, name: 'Ready', icon: <CheckCircle className="w-6 h-6" /> },
+    { id: 4, name: 'Completed', icon: <CheckCheck className="w-6 h-6" /> },
   ]
 
   const getStatusIndex = (status) => {
@@ -31,11 +32,11 @@ const TrackOrder = () => {
   const currentStep = getStatusIndex(order.status)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50 py-8">
+    <div className="min-h-screen bg-food-surface py-8">
       <div className="container mx-auto px-4 max-w-4xl">
         <h1 className="text-4xl font-bold text-food-dark mb-8">Track Order #{order.id}</h1>
         
-        <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
+        <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8 mb-8">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-food-dark mb-4">Order Details</h2>
             <div className="space-y-2 text-gray-700">
@@ -58,14 +59,14 @@ const TrackOrder = () => {
         </div>
 
         {/* Status Timeline */}
-        <div className="bg-white rounded-xl shadow-lg p-8">
+        <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8">
           <h2 className="text-2xl font-bold text-food-dark mb-8">Order Status</h2>
           
           <div className="relative">
             {/* Progress Line */}
             <div className="absolute left-8 top-0 bottom-0 w-1 bg-gray-200">
               <div
-                className="absolute top-0 left-0 w-full bg-gradient-to-b from-food-orange to-orange-500 transition-all duration-500"
+                className="absolute top-0 left-0 w-full bg-food-orange transition-all duration-500"
                 style={{ height: `${((currentStep - 1) / (statusSteps.length - 1)) * 100}%` }}
               />
             </div>
@@ -79,9 +80,9 @@ const TrackOrder = () => {
                 return (
                   <div key={step.id} className="flex items-start gap-6">
                     <div
-                      className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold transition-all ${
+                      className={`w-16 h-16 rounded-md flex items-center justify-center text-2xl font-bold transition-all ${
                         isCompleted
-                          ? 'bg-gradient-to-r from-food-orange to-orange-500 text-white shadow-lg scale-110'
+                          ? 'bg-food-orange text-white font-medium shadow-lg scale-110'
                           : 'bg-gray-200 text-gray-400'
                       }`}
                     >

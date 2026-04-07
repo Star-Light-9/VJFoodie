@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Sidebar from '../../components/Sidebar'
 import { pantryItems as initialPantryItems } from '../../data/dummyData'
+import { AlertCircle } from 'lucide-react'
 
 const StaffPantry = () => {
   const [pantryItems, setPantryItems] = useState(initialPantryItems)
@@ -45,15 +46,15 @@ const StaffPantry = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50">
+    <div className="flex min-h-screen bg-food-surface">
       <Sidebar />
       <div className="flex-grow p-8">
         <h1 className="text-4xl font-bold text-food-dark mb-8">Pantry Inventory</h1>
         
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gradient-to-r from-food-green to-green-500 text-white">
+              <thead className="bg-white border border-slate-200 text-slate-700 font-medium">
                 <tr>
                   <th className="px-6 py-4 text-left font-semibold">Ingredient</th>
                   <th className="px-6 py-4 text-left font-semibold">Stock Level</th>
@@ -69,7 +70,7 @@ const StaffPantry = () => {
                       <div className="text-sm text-gray-500">Unit: {item.unit}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getStockLevelColor(item.level)}`}>
+                      <span className={`px-3 py-1 rounded-md text-sm font-semibold ${getStockLevelColor(item.level)}`}>
                         {item.level}
                       </span>
                     </td>
@@ -128,21 +129,21 @@ const StaffPantry = () => {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="text-3xl mb-2">🔴</div>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+            <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-2" />
             <h3 className="text-lg font-semibold text-gray-600 mb-1">Low Stock</h3>
             <p className="text-3xl font-bold text-red-600">
               {pantryItems.filter(item => item.level === 'Low').length}
             </p>
           </div>
-          <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
             <div className="text-3xl mb-2">🟡</div>
             <h3 className="text-lg font-semibold text-gray-600 mb-1">Medium Stock</h3>
             <p className="text-3xl font-bold text-yellow-600">
               {pantryItems.filter(item => item.level === 'Medium').length}
             </p>
           </div>
-          <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
             <div className="text-3xl mb-2">🟢</div>
             <h3 className="text-lg font-semibold text-gray-600 mb-1">High Stock</h3>
             <p className="text-3xl font-bold text-green-600">
