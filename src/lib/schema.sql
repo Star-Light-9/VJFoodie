@@ -111,6 +111,12 @@ CREATE POLICY "Users can view their own profile"
   ON profiles FOR SELECT
   USING (auth.uid() = user_id);
 
+CREATE POLICY "Staff can view all profiles"
+  ON profiles FOR SELECT
+  USING (
+    (auth.jwt() -> 'user_metadata' ->> 'role') = 'staff'
+  );
+
 CREATE POLICY "Users can update their own profile"
   ON profiles FOR UPDATE
   USING (auth.uid() = user_id);
