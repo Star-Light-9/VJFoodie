@@ -263,36 +263,52 @@ export const updateOrderStatus = async (orderId, newStatus) => {
   return { data, error }
 }
 
-// ---- INVENTORY ----
+// ---- INVENTORY (Standalone) ----
 
-/** Fetch all inventory items with menu details */
+/** Fetch all inventory items */
 export const getInventory = async () => {
   const { data, error } = await supabase
     .from('inventory')
-    .select(`
-      inventory_id,
-      stock,
-      last_updated,
-      menu ( item_id, item_name )
-    `)
-    .order('inventory_id')
+    .select('*')
+    .order('item_name')
 
   return { data: data || [], error }
 }
 
-/** Update stock for an inventory item (staff only) */
-export const updateInventoryStock = async (inventoryId, newStock) => {
+/** Add a new inventory item (staff only) */
+export const addInventoryItem = async (item) => {
+  const { data, error } = await supabase
+    .from('inventory')
+    .insert([item])
+    .select()
+    .single()
+
+  return { data, error }
+}
+
+/** Update an inventory item (staff only) */
+export const updateInventoryItem = async (inventoryId, updates) => {
   const { data, error } = await supabase
     .from('inventory')
     .update({
-      stock: newStock,
-      last_updated: new Date().toISOString()
+      ...updates,
+      updated_at: new Date().toISOString()
     })
     .eq('inventory_id', inventoryId)
     .select()
     .single()
 
   return { data, error }
+}
+
+/** Delete an inventory item (staff only) */
+export const deleteInventoryItem = async (inventoryId) => {
+  const { error } = await supabase
+    .from('inventory')
+    .delete()
+    .eq('inventory_id', inventoryId)
+
+  return { error }
 }
 
 // ---- FEEDBACK ----

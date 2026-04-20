@@ -56,12 +56,17 @@ CREATE TABLE IF NOT EXISTS payments (
   amount NUMERIC(10, 2) NOT NULL
 );
 
--- 7. INVENTORY TABLE
+-- 7. INVENTORY TABLE (Standalone)
 CREATE TABLE IF NOT EXISTS inventory (
   inventory_id SERIAL PRIMARY KEY,
-  item_id INTEGER NOT NULL REFERENCES menu(item_id) ON DELETE CASCADE,
-  stock INTEGER NOT NULL DEFAULT 0 CHECK (stock >= 0),
-  last_updated TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  item_name TEXT NOT NULL,
+  category TEXT NOT NULL,
+  stock_quantity INTEGER NOT NULL DEFAULT 0 CHECK (stock_quantity >= 0),
+  unit TEXT NOT NULL DEFAULT 'pcs',
+  low_stock_threshold INTEGER NOT NULL DEFAULT 5,
+  cost_price NUMERIC(10, 2),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- 8. FEEDBACK TABLE
