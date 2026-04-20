@@ -1,16 +1,25 @@
+import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { orderHistory } from '../data/dummyData'
-import { ClipboardList, ChefHat, CheckCircle, CheckCheck } from 'lucide-react'
+import { getOrderById } from '../lib/supabaseAPI'
+import { ClipboardList, ChefHat, CheckCircle, CheckCheck, Loader2 } from 'lucide-react'
 
 const TrackOrder = () => {
   const { orderId } = useParams()
-  const order = orderHistory.find(o => o.id === orderId) || {
-    id: orderId,
-    date: '2024-01-15',
-    items: [{ name: 'Veg Biryani', quantity: 2, price: 120 }],
-    total: 290,
-    status: 'Preparing'
-  }
+  const [order, setOrder] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchOrder = async () => {
+      const { data, error } = await getOrderById(orderId)
+      if (error) {
+        console.error('Error fetching order:', error)
+      } else {
+        setOrder(data)
+      }
+      setLoading(false)
+    }
+    fetchOrder()
+  }, [orderId])
 
   const statusSteps = [
     { id: 1, name: 'Order Placed', icon: <ClipboardList className="w-6 h-6" /> },
@@ -29,27 +38,58 @@ const TrackOrder = () => {
     return statusMap[status] || 1
   }
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-food-surface flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-food-orange animate-spin mx-auto mb-4" />
+          <p className="text-slate-500 text-lg">Loading order details...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!order) {
+    return (
+      <div className="min-h-screen bg-food-surface flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-food-dark mb-2">Order not found</h2>
+          <p className="text-gray-600">Could not find order #{orderId}</p>
+        </div>
+      </div>
+    )
+  }
+
   const currentStep = getStatusIndex(order.status)
+  const formattedDate = new Date(order.order_date).toLocaleDateString('en-IN', {
+    year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+  })
+
+  const items = (order.order_items || []).map(oi => ({
+    name: oi.menu?.item_name || 'Unknown Item',
+    quantity: oi.quantity,
+    price: Number(oi.price_at_time)
+  }))
 
   return (
     <div className="min-h-screen bg-food-surface py-8">
       <div className="container mx-auto px-4 max-w-4xl">
-        <h1 className="text-4xl font-bold text-food-dark mb-8">Track Order #{order.id}</h1>
+        <h1 className="text-4xl font-bold text-food-dark mb-8">Track Order #{order.order_id}</h1>
         
         <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8 mb-8">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-food-dark mb-4">Order Details</h2>
             <div className="space-y-2 text-gray-700">
-              <p><span className="font-semibold">Order ID:</span> {order.id}</p>
-              <p><span className="font-semibold">Date:</span> {order.date}</p>
-              <p><span className="font-semibold">Total:</span> <span className="text-food-orange font-bold text-xl">₹{order.total}</span></p>
+              <p><span className="font-semibold">Order ID:</span> {order.order_id}</p>
+              <p><span className="font-semibold">Date:</span> {formattedDate}</p>
+              <p><span className="font-semibold">Total:</span> <span className="text-food-orange font-bold text-xl">₹{order.total_price}</span></p>
             </div>
           </div>
 
           <div>
             <h3 className="text-lg font-semibold text-food-dark mb-3">Items:</h3>
             <ul className="list-disc list-inside space-y-1 text-gray-700">
-              {order.items.map((item, idx) => (
+              {items.map((item, idx) => (
                 <li key={idx}>
                   {item.name} x{item.quantity} - ₹{item.price * item.quantity}
                 </li>
@@ -115,4 +155,3 @@ const TrackOrder = () => {
 }
 
 export default TrackOrder
-

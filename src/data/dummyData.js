@@ -28,7 +28,7 @@ export const menuItems = [
     name: 'Vada Pav',
     category: 'Snacks',
     price: 25,
-    image: 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=400',
+    image: 'https://images.unsplash.com/photo-1606491956689-2ea866880049?w=400',
     description: 'Mumbai style vada pav'
   },
   {
@@ -36,7 +36,7 @@ export const menuItems = [
     name: 'Pav Bhaji',
     category: 'Snacks',
     price: 80,
-    image: 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=400',
+    image: 'https://images.unsplash.com/photo-1626132647523-66f5bf380027?w=400',
     description: 'Spicy vegetable curry with buttered bread'
   },
   {
@@ -84,7 +84,7 @@ export const menuItems = [
     name: 'Paneer Tikka',
     category: 'Snacks',
     price: 100,
-    image: 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=400',
+    image: 'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=400',
     description: 'Grilled paneer with spices'
   },
   {
@@ -92,7 +92,7 @@ export const menuItems = [
     name: 'Dal Rice',
     category: 'Meals',
     price: 70,
-    image: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=400',
+    image: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400',
     description: 'Lentil curry with steamed rice'
   }
 ]

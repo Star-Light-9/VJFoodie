@@ -9,14 +9,14 @@ const Signup = () => {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
-  
+
   const { signup } = useAuth()
   const navigate = useNavigate()
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault()
     setError('')
-    
+
     if (!name || !email || !password || !confirmPassword) {
       setError('Please fill in all fields')
       return
@@ -27,7 +27,8 @@ const Signup = () => {
       return
     }
 
-    const result = signup(name, email, password)
+    const result = await signup(name, email, password)
+
     if (result.success) {
       navigate('/')
     } else {
@@ -47,7 +48,7 @@ const Signup = () => {
             Join VJFoodie as a customer to order food instantly
           </p>
         </div>
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleSignup}>
           {error && (
             <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm text-center border border-red-100">
@@ -91,8 +92,9 @@ const Signup = () => {
                 type="password"
                 autoComplete="new-password"
                 required
+                minLength={6}
                 className="appearance-none rounded-md relative block w-full px-3 py-2 border border-slate-300 placeholder-gray-500 text-food-dark focus:outline-none focus:ring-food-orange focus:border-food-orange focus:z-10 sm:text-sm"
-                placeholder="Password"
+                placeholder="Password (min. 6 characters)"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -105,6 +107,7 @@ const Signup = () => {
                 type="password"
                 autoComplete="new-password"
                 required
+                minLength={6}
                 className="appearance-none rounded-md relative block w-full px-3 py-2 border border-slate-300 placeholder-gray-500 text-food-dark focus:outline-none focus:ring-food-orange focus:border-food-orange focus:z-10 sm:text-sm"
                 placeholder="Confirm password"
                 value={confirmPassword}
@@ -122,7 +125,7 @@ const Signup = () => {
             </button>
           </div>
         </form>
-        
+
         <div className="text-center mt-4">
           <p className="text-sm text-slate-600">
             Already have an account?{' '}

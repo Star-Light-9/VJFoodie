@@ -1,10 +1,25 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { menuItems } from '../data/dummyData'
+import { getMenuItems } from '../lib/supabaseAPI'
 import FoodCard from '../components/FoodCard'
-import { Zap, ChefHat, Smartphone } from 'lucide-react'
+import { Zap, ChefHat, Smartphone, Loader2 } from 'lucide-react'
 
 const Home = () => {
-  const featuredItems = menuItems.slice(0, 4)
+  const [featuredItems, setFeaturedItems] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      const { data, error } = await getMenuItems()
+      if (error) {
+        console.error('Error fetching menu:', error)
+      } else {
+        setFeaturedItems(data.slice(0, 4))
+      }
+      setLoading(false)
+    }
+    fetchFeatured()
+  }, [])
 
   return (
     <div className="min-h-screen bg-food-surface">
@@ -32,11 +47,17 @@ const Home = () => {
           <h2 className="text-2xl font-bold text-food-dark">Featured Choices</h2>
           <Link to="/menu" className="text-food-orange font-medium hover:underline">View full menu &rarr;</Link>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featuredItems.map((item) => (
-            <FoodCard key={item.id} item={item} />
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="w-10 h-10 text-food-orange animate-spin" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {featuredItems.map((item) => (
+              <FoodCard key={item.item_id} item={item} />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Features Section */}
@@ -72,4 +93,3 @@ const Home = () => {
 }
 
 export default Home
-

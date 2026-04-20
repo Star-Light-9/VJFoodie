@@ -1,17 +1,45 @@
-import { orderHistory } from '../data/dummyData'
+import { useState, useEffect } from 'react'
+import { getUserOrders } from '../lib/supabaseAPI'
 import OrderCard from '../components/OrderCard'
-import { Package } from 'lucide-react'
+import { Package, Loader2 } from 'lucide-react'
 
 const Orders = () => {
+  const [orders, setOrders] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      const { data, error } = await getUserOrders()
+      if (error) {
+        console.error('Error fetching orders:', error)
+      } else {
+        setOrders(data)
+      }
+      setLoading(false)
+    }
+    fetchOrders()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-food-surface flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-food-orange animate-spin mx-auto mb-4" />
+          <p className="text-slate-500 text-lg">Loading your orders...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-food-surface py-8">
       <div className="container mx-auto px-4">
         <h1 className="text-4xl font-bold text-food-dark mb-8">Order History</h1>
         
-        {orderHistory.length > 0 ? (
+        {orders.length > 0 ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {orderHistory.map((order) => (
-              <OrderCard key={order.id} order={order} />
+            {orders.map((order) => (
+              <OrderCard key={order.order_id} order={order} />
             ))}
           </div>
         ) : (
@@ -27,4 +55,3 @@ const Orders = () => {
 }
 
 export default Orders
-

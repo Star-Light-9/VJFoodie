@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+import { supabase } from '../lib/supabase'
 
 const AuthContext = createContext()
 
@@ -10,96 +11,111 @@ export const useAuth = () => {
   return context
 }
 
-// Pre-defined Staff Accounts
-const STAFF_ACCOUNTS = [
-  { id: 's1', name: 'Admin Staff', email: 'staff@vjfoodie.com', password: 'staff', role: 'staff' },
-]
-
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem('vjFoodieUser')
-    return savedUser ? JSON.parse(savedUser) : null
-  })
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  // Helper: fetch profile from profiles table and merge with auth user
+  const fetchAndSetUser = async (authUser) => {
+    if (!authUser) {
+      setUser(null)
+      return
+    }
+
+    // Try to get the profile from the database
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('name, email, role')
+      .eq('user_id', authUser.id)
+      .single()
+
+    setUser({
+      id: authUser.id,
+      email: authUser.email,
+      name: profile?.name || authUser.user_metadata?.name || 'User',
+      role: profile?.role || authUser.user_metadata?.role || 'customer'
+    })
+  }
 
   useEffect(() => {
-    if (user) {
-      localStorage.setItem('vjFoodieUser', JSON.stringify(user))
-    } else {
-      localStorage.removeItem('vjFoodieUser')
-    }
-  }, [user])
-
-  const login = (email, password) => {
-    // 1. Check if it's a staff account
-    const staffMatch = STAFF_ACCOUNTS.find(s => s.email === email && s.password === password)
-    if (staffMatch) {
-      const { password, ...staffInfo } = staffMatch
-      setUser(staffInfo)
-      return { success: true, role: staffInfo.role }
-    }
-
-    // 2. Check if it's a registered customer
-    let customers = JSON.parse(localStorage.getItem('vjFoodieCustomers'))
-    
-    // Inject a default demo customer if the system is completely empty
-    if (!customers || customers.length === 0) {
-      const demoCustomer = {
-        id: 'c1',
-        name: 'John Doe',
-        email: 'user@vjfoodie.com',
-        password: 'user123',
-        role: 'customer'
+    // Check active sessions and sets the user
+    const getInitialSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        await fetchAndSetUser(session.user)
       }
-      customers = [demoCustomer]
-      localStorage.setItem('vjFoodieCustomers', JSON.stringify(customers))
+      setLoading(false)
     }
 
-    const customerMatch = customers.find(c => c.email === email && c.password === password)
-    
-    if (customerMatch) {
-      const { password, ...customerInfo } = customerMatch
-      setUser(customerInfo)
-      return { success: true, role: customerInfo.role }
-    }
+    getInitialSession()
 
-    return { success: false, message: 'Invalid credentials' }
+    // Listen for changes on auth state (logged in, signed out, etc.)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session) {
+        await fetchAndSetUser(session.user)
+      } else {
+        setUser(null)
+      }
+      setLoading(false)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  // Helper to convert username to a valid email format for Supabase
+  const formatEmail = (username) => {
+    return username.includes('@') ? username : `${username}@vjfoodie.com`
   }
 
-  const signup = (name, email, password) => {
-    // Check if email already exists (even in staff, though unlikely)
-    const isStaffEmail = STAFF_ACCOUNTS.some(s => s.email === email)
-    const customers = JSON.parse(localStorage.getItem('vjFoodieCustomers')) || []
-    const isCustomerEmail = customers.some(c => c.email === email)
+  const login = async (username, password) => {
+    try {
+      const email = formatEmail(username)
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-    if (isStaffEmail || isCustomerEmail) {
-      return { success: false, message: 'Email is already registered' }
+      if (error) throw error
+
+      // Profile will be fetched by the onAuthStateChange listener
+      const role = data.user.user_metadata.role || 'customer'
+      return { success: true, role }
+    } catch (error) {
+      return { success: false, message: error.message }
     }
-
-    const newCustomer = {
-      id: Date.now().toString(),
-      name,
-      email,
-      password,
-      role: 'customer' // Strongly enforced customer role
-    }
-
-    customers.push(newCustomer)
-    localStorage.setItem('vjFoodieCustomers', JSON.stringify(customers))
-    
-    // Auto login
-    const { password: _, ...customerInfo } = newCustomer
-    setUser(customerInfo)
-    
-    return { success: true }
   }
 
-  const logout = () => {
+  const signup = async (name, username, password) => {
+    try {
+      const email = formatEmail(username)
+      const role = 'customer'
+
+      // Create auth user — the database trigger automatically creates the profile
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { name, role },
+        },
+      })
+
+      if (error) throw error
+
+      return { success: true, role }
+
+    } catch (error) {
+      return { success: false, message: error.message }
+    }
+  }
+
+  const logout = async () => {
+    await supabase.auth.signOut()
     setUser(null)
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout }}>
-      {children}
+    <AuthContext.Provider value={{ user, login, signup, logout, loading }}>
+      {!loading && children}
     </AuthContext.Provider>
   )
 }

@@ -1,25 +1,49 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
-import { Wallet, Smartphone, CreditCard, CheckCircle } from 'lucide-react'
+import { createOrder } from '../lib/supabaseAPI'
+import { Wallet, Smartphone, CreditCard, CheckCircle, Loader2 } from 'lucide-react'
 
 const Payment = () => {
   const navigate = useNavigate()
   const { cart, getTotalPrice, clearCart } = useCart()
   const [paymentMethod, setPaymentMethod] = useState('wallet')
   const [showSuccess, setShowSuccess] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [error, setError] = useState('')
 
   const total = (getTotalPrice() * 1.05).toFixed(2)
 
-  const handleConfirmOrder = () => {
-    // Simulate order processing
+  const handleConfirmOrder = async () => {
+    setIsProcessing(true)
+    setError('')
+
+    // Map cart items to the format expected by createOrder
+    const cartItems = cart.map(item => ({
+      item_id: item.item_id || item.id,
+      quantity: item.quantity,
+      price: Number(item.price)
+    }))
+
+    const { data, error: orderError } = await createOrder(
+      cartItems,
+      paymentMethod,
+      Number(total)
+    )
+
+    if (orderError) {
+      console.error('Order creation failed:', orderError)
+      setError(typeof orderError === 'string' ? orderError : orderError.message || 'Failed to place order. Please try again.')
+      setIsProcessing(false)
+      return
+    }
+
+    // Order placed successfully
+    setShowSuccess(true)
+    clearCart()
     setTimeout(() => {
-      setShowSuccess(true)
-      clearCart()
-      setTimeout(() => {
-        navigate('/orders')
-      }, 2000)
-    }, 1000)
+      navigate('/orders')
+    }, 2000)
   }
 
   if (showSuccess) {
@@ -39,6 +63,12 @@ const Payment = () => {
       <div className="container mx-auto px-4">
         <h1 className="text-4xl font-bold text-food-dark mb-8">Payment</h1>
         
+        {error && (
+          <div className="bg-red-50 text-red-600 p-4 rounded-md text-sm mb-6 border border-red-100">
+            {error}
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Payment Options */}
           <div className="lg:col-span-2">
@@ -165,9 +195,17 @@ const Payment = () => {
 
               <button
                 onClick={handleConfirmOrder}
-                className="w-full mt-6 bg-food-orange text-white font-medium py-4 rounded-lg font-bold text-lg hover:shadow-lg transition-shadow"
+                disabled={isProcessing}
+                className="w-full mt-6 bg-food-orange text-white font-medium py-4 rounded-lg font-bold text-lg hover:shadow-lg transition-shadow disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                Confirm Order
+                {isProcessing ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  'Confirm Order'
+                )}
               </button>
             </div>
           </div>
@@ -178,4 +216,3 @@ const Payment = () => {
 }
 
 export default Payment
-

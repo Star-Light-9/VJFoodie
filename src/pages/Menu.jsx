@@ -1,18 +1,45 @@
-import { useState } from 'react'
-import { menuItems } from '../data/dummyData'
+import { useState, useEffect } from 'react'
+import { getMenuItems } from '../lib/supabaseAPI'
 import FoodCard from '../components/FoodCard'
+import { Loader2 } from 'lucide-react'
 
 const Menu = () => {
+  const [menuItems, setMenuItems] = useState([])
+  const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
+
+  useEffect(() => {
+    const fetchMenu = async () => {
+      const { data, error } = await getMenuItems()
+      if (error) {
+        console.error('Error fetching menu:', error)
+      } else {
+        setMenuItems(data)
+      }
+      setLoading(false)
+    }
+    fetchMenu()
+  }, [])
 
   const categories = ['All', ...new Set(menuItems.map(item => item.category))]
 
   const filteredItems = menuItems.filter(item => {
-    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesSearch = item.item_name.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory
     return matchesSearch && matchesCategory
   })
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-food-surface flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-food-orange animate-spin mx-auto mb-4" />
+          <p className="text-slate-500 text-lg">Loading menu...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-food-surface py-8">
@@ -51,7 +78,7 @@ const Menu = () => {
         {filteredItems.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredItems.map((item) => (
-              <FoodCard key={item.id} item={item} />
+              <FoodCard key={item.item_id} item={item} />
             ))}
           </div>
         ) : (
@@ -65,4 +92,3 @@ const Menu = () => {
 }
 
 export default Menu
-

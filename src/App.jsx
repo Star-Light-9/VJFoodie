@@ -9,6 +9,7 @@ import Cart from './pages/Cart'
 import Payment from './pages/Payment'
 import Orders from './pages/Orders'
 import TrackOrder from './pages/TrackOrder'
+import Feedback from './pages/Feedback'
 import StaffDashboard from './pages/staff/StaffDashboard'
 import StaffOrders from './pages/staff/StaffOrders'
 import StaffPantry from './pages/staff/StaffPantry'
@@ -35,6 +36,7 @@ function App() {
             <Route path="/payment" element={<ProtectedRoute allowedRoles={['customer']}><Payment /></ProtectedRoute>} />
             <Route path="/orders" element={<ProtectedRoute allowedRoles={['customer']}><Orders /></ProtectedRoute>} />
             <Route path="/track/:orderId" element={<ProtectedRoute allowedRoles={['customer']}><TrackOrder /></ProtectedRoute>} />
+            <Route path="/feedback" element={<ProtectedRoute allowedRoles={['customer']}><Feedback /></ProtectedRoute>} />
             
             {/* Staff Routes */}
             <Route path="/staff/dashboard" element={<ProtectedRoute allowedRoles={['staff']}><StaffDashboard /></ProtectedRoute>} />
@@ -48,4 +50,3 @@ function App() {
 }
 
 export default App
-
