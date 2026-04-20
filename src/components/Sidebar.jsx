@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, ClipboardList, Package, LogOut } from 'lucide-react'
+import { LayoutDashboard, ClipboardList, Package, LogOut, Utensils } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
 const Sidebar = () => {
@@ -10,6 +10,7 @@ const Sidebar = () => {
   const menuItems = [
     { path: '/staff/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/staff/orders', label: 'Orders', icon: ClipboardList },
+    { path: '/staff/menu', label: 'Manage Menu', icon: Utensils },
     { path: '/staff/pantry', label: 'Pantry', icon: Package },
   ]
 

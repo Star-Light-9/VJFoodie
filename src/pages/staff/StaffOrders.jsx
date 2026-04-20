@@ -81,7 +81,7 @@ const StaffOrders = () => {
       <Sidebar />
       <div className="flex-grow p-8">
         <h1 className="text-4xl font-bold text-food-dark mb-8">Order Queue</h1>
-        
+
         <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">

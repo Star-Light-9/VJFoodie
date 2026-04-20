@@ -12,6 +12,7 @@ import TrackOrder from './pages/TrackOrder'
 import Feedback from './pages/Feedback'
 import StaffDashboard from './pages/staff/StaffDashboard'
 import StaffOrders from './pages/staff/StaffOrders'
+import StaffMenu from './pages/staff/StaffMenu'
 import StaffPantry from './pages/staff/StaffPantry'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
@@ -41,6 +42,7 @@ function App() {
             {/* Staff Routes */}
             <Route path="/staff/dashboard" element={<ProtectedRoute allowedRoles={['staff']}><StaffDashboard /></ProtectedRoute>} />
             <Route path="/staff/orders" element={<ProtectedRoute allowedRoles={['staff']}><StaffOrders /></ProtectedRoute>} />
+            <Route path="/staff/menu" element={<ProtectedRoute allowedRoles={['staff']}><StaffMenu /></ProtectedRoute>} />
             <Route path="/staff/pantry" element={<ProtectedRoute allowedRoles={['staff']}><StaffPantry /></ProtectedRoute>} />
           </Routes>
         </Router>
