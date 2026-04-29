@@ -1,15 +1,21 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
 import { createOrder } from '../lib/supabaseAPI'
-import { Wallet, Smartphone, CreditCard, CheckCircle, Loader2, X, AlertCircle } from 'lucide-react'
+import { Wallet, Smartphone, CreditCard, CheckCircle, Loader2, X, AlertCircle, ChefHat, Download } from 'lucide-react'
 import { QRCodeCanvas } from 'qrcode.react'
+import html2canvas from 'html2canvas'
+import { jsPDF } from 'jspdf'
 
 const Payment = () => {
   const navigate = useNavigate()
   const { cart, getTotalPrice, clearCart } = useCart()
+  const { user } = useAuth()
+  const receiptRef = useRef(null)
   const [paymentMethod, setPaymentMethod] = useState('wallet')
   const [showSuccess, setShowSuccess] = useState(false)
+  const [receiptData, setReceiptData] = useState(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [error, setError] = useState('')
   
@@ -55,10 +61,11 @@ const Payment = () => {
     const cartItems = cart.map(item => ({
       item_id: item.item_id || item.id,
       quantity: item.quantity,
-      price: Number(item.price)
+      price: Number(item.price),
+      name: item.name
     }))
 
-    const { error: orderError } = await createOrder(
+    const { data: orderData, error: orderError } = await createOrder(
       cartItems,
       paymentMethod,
       Number(total)
@@ -73,12 +80,17 @@ const Payment = () => {
     }
 
     // Success flow
+    setReceiptData({
+      orderId: orderData?.order_id || 'N/A',
+      date: new Date(),
+      items: cartItems,
+      subtotal: getTotalPrice(),
+      tax: (getTotalPrice() * 0.05).toFixed(2),
+      total: total,
+    })
     setShowQR(false)
     setShowSuccess(true)
     clearCart()
-    setTimeout(() => {
-      navigate('/orders')
-    }, 2000)
   }
 
   const handleCancelPayment = () => {
@@ -87,16 +99,103 @@ const Payment = () => {
     setIsProcessing(false)
   }
 
+  const handleDownloadPDF = async () => {
+    if (!receiptRef.current) return
+    try {
+      const element = receiptRef.current
+      const canvas = await html2canvas(element, { scale: 2, backgroundColor: '#ffffff' })
+      const imgData = canvas.toDataURL('image/png')
+      
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'px',
+        format: [canvas.width, canvas.height]
+      })
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height)
+      pdf.save(`VJFoodie_Receipt_${receiptData.orderId}.pdf`)
+    } catch (err) {
+      console.error('Error generating PDF:', err)
+      setError('Failed to generate PDF. Please try again.')
+    }
+  }
+
   // UPI Payment Link Simulation
   const upiLink = `upi://pay?pa=test@upi&pn=VJFoodie&am=${total}&cu=INR`
 
-  if (showSuccess) {
+  if (showSuccess && receiptData) {
     return (
-      <div className="min-h-screen bg-food-surface flex items-center justify-center">
-        <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-12 text-center max-w-md">
-          <CheckCircle className="w-16 h-16 mx-auto text-emerald-500 mb-4" />
-          <h2 className="text-3xl font-bold text-food-dark mb-4">Order Placed Successfully!</h2>
-          <p className="text-gray-600">Your order is being prepared. Redirecting to orders...</p>
+      <div className="min-h-screen bg-food-surface flex items-center justify-center py-12 px-4">
+        <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-8 w-full max-w-md relative overflow-hidden">
+          <div ref={receiptRef} className="bg-white p-4 -m-4 mb-4">
+            <div className="text-center mt-2 mb-6 border-b border-dashed pb-6">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <ChefHat className="w-8 h-8 text-food-orange" />
+                <h2 className="text-3xl font-black text-food-dark">VJFoodie</h2>
+              </div>
+              <h3 className="text-gray-500 font-semibold tracking-widest uppercase text-sm mb-4">Payment Receipt</h3>
+              <p className="text-sm text-gray-500 font-medium">Order ID: #{receiptData.orderId}</p>
+              <p className="text-sm text-gray-500">
+                {receiptData.date.toLocaleDateString()} at {receiptData.date.toLocaleTimeString()}
+              </p>
+            </div>
+
+            <div className="mb-6">
+              <p className="font-semibold text-food-dark text-sm">Customer: <span className="font-normal text-gray-600">{user?.name || 'Guest'}</span></p>
+            </div>
+
+            <div className="border-b border-dashed pb-4 mb-4 space-y-3">
+              {receiptData.items.map((item, idx) => (
+                <div key={idx} className="flex justify-between text-sm">
+                  <span className="text-gray-700">{item.quantity}x {item.name}</span>
+                  <span className="font-medium">₹{(item.price * item.quantity).toFixed(2)}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-2 mb-4">
+              <div className="flex justify-between text-sm text-gray-500">
+                <span>Subtotal</span>
+                <span>₹{receiptData.subtotal}</span>
+              </div>
+              <div className="flex justify-between text-sm text-gray-500">
+                <span>GST (5%)</span>
+                <span>₹{receiptData.tax}</span>
+              </div>
+              <div className="flex justify-between text-xl font-bold text-food-dark mt-4 pt-4 border-t">
+                <span>Total Paid</span>
+                <span>₹{receiptData.total}</span>
+              </div>
+            </div>
+            
+            <div className="text-center bg-emerald-50 rounded-lg p-4 mt-6 border border-emerald-100">
+              <CheckCircle className="w-8 h-8 mx-auto text-emerald-500 mb-2" />
+              <p className="font-bold text-emerald-600">Payment Successful</p>
+            </div>
+          </div>
+          
+          {error && (
+            <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm mb-4 border border-red-100 flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              {error}
+            </div>
+          )}
+          
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={handleDownloadPDF}
+              className="w-full bg-white border-2 border-food-orange text-food-orange font-bold py-3 rounded-xl hover:bg-orange-50 transition-colors shadow-sm flex items-center justify-center gap-2"
+            >
+              <Download className="w-5 h-5" />
+              Save as PDF
+            </button>
+            <button
+              onClick={() => navigate('/orders')}
+              className="w-full bg-food-orange text-white font-bold py-4 rounded-xl hover:bg-orange-600 transition-colors shadow-md hover:shadow-lg active:scale-95"
+            >
+              Continue to Orders
+            </button>
+          </div>
         </div>
       </div>
     )
