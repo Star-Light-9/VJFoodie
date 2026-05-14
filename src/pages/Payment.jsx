@@ -5,8 +5,8 @@ import { useAuth } from '../context/AuthContext'
 import { createOrder } from '../lib/supabaseAPI'
 import { Wallet, Smartphone, CreditCard, CheckCircle, Loader2, X, AlertCircle, ChefHat, Download } from 'lucide-react'
 import { QRCodeCanvas } from 'qrcode.react'
-import html2canvas from 'html2canvas'
 import { jsPDF } from 'jspdf'
+import autoTable from 'jspdf-autotable'
 
 const Payment = () => {
   const navigate = useNavigate()
@@ -99,21 +99,60 @@ const Payment = () => {
     setIsProcessing(false)
   }
 
-  const handleDownloadPDF = async () => {
-    if (!receiptRef.current) return
+  const handleDownloadPDF = () => {
+    if (!receiptData) return
     try {
-      const element = receiptRef.current
-      const canvas = await html2canvas(element, { scale: 2, backgroundColor: '#ffffff' })
-      const imgData = canvas.toDataURL('image/png')
+      const doc = new jsPDF()
       
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'px',
-        format: [canvas.width, canvas.height]
+      doc.setFontSize(22)
+      doc.setTextColor(249, 115, 22) // food-orange
+      doc.text('VJFoodie', 105, 20, { align: 'center' })
+      
+      doc.setFontSize(14)
+      doc.setTextColor(100)
+      doc.text('Payment Receipt', 105, 30, { align: 'center' })
+      
+      doc.setFontSize(10)
+      doc.setTextColor(80)
+      doc.text(`Order ID: #${receiptData.orderId}`, 14, 45)
+      doc.text(`Date: ${receiptData.date.toLocaleDateString()} ${receiptData.date.toLocaleTimeString()}`, 14, 51)
+      doc.text(`Customer: ${user?.name || 'Guest'}`, 14, 57)
+
+      const tableColumn = ["Item", "Qty", "Price"]
+      const tableRows = receiptData.items.map(item => [
+        item.name,
+        item.quantity.toString(),
+        `Rs. ${(item.price * item.quantity).toFixed(2)}`
+      ])
+
+      autoTable(doc, {
+        head: [tableColumn],
+        body: tableRows,
+        startY: 65,
+        styles: { fontSize: 10, cellPadding: 3 },
+        headStyles: { fillColor: [249, 115, 22] },
       })
+
+      const finalY = doc.lastAutoTable.finalY || 65
+
+      doc.setFontSize(10)
+      doc.setTextColor(100)
+      doc.text('Subtotal:', 140, finalY + 10)
+      doc.text(`Rs. ${receiptData.subtotal}`, 170, finalY + 10)
       
-      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height)
-      pdf.save(`VJFoodie_Receipt_${receiptData.orderId}.pdf`)
+      doc.text('GST (5%):', 140, finalY + 16)
+      doc.text(`Rs. ${receiptData.tax}`, 170, finalY + 16)
+      
+      doc.setFontSize(12)
+      doc.setTextColor(0)
+      doc.text('Total Paid:', 140, finalY + 26)
+      doc.text(`Rs. ${receiptData.total}`, 170, finalY + 26)
+      
+      doc.setFontSize(12)
+      doc.setTextColor(16, 185, 129) // emerald-500
+      doc.text('Payment Successful', 105, finalY + 45, { align: 'center' })
+
+      doc.save(`VJFoodie_Receipt_${receiptData.orderId}.pdf`)
     } catch (err) {
       console.error('Error generating PDF:', err)
       setError('Failed to generate PDF. Please try again.')
