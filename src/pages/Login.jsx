@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { Utensils } from 'lucide-react'
 
@@ -10,6 +10,7 @@ const Login = () => {
 
   const { login } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -23,7 +24,11 @@ const Login = () => {
     const result = await login(email, password)
 
     if (result.success) {
-      if (result.role === 'staff') {
+      const redirectTo = location.state?.from
+
+      if (redirectTo) {
+        navigate(redirectTo)
+      } else if (result.role === 'staff') {
         navigate('/staff/dashboard')
       } else {
         navigate('/')
@@ -40,7 +45,11 @@ const Login = () => {
           <div className="bg-orange-50 p-3 rounded-full mb-4">
             <Utensils className="w-8 h-8 text-food-orange" />
           </div>
-          <h2 className="text-3xl font-extrabold text-food-dark">Welcome back</h2>
+
+          <h2 className="text-3xl font-extrabold text-food-dark">
+            Welcome back
+          </h2>
+
           <p className="mt-2 text-sm text-slate-500">
             Sign in to access your VJFoodie account
           </p>
@@ -52,9 +61,16 @@ const Login = () => {
               {error}
             </div>
           )}
+
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="email">Email address</label>
+              <label
+                className="block text-sm font-medium text-slate-700 mb-1"
+                htmlFor="email"
+              >
+                Email address
+              </label>
+
               <input
                 id="email"
                 name="email"
@@ -67,8 +83,15 @@ const Login = () => {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
+
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="password">Password</label>
+              <label
+                className="block text-sm font-medium text-slate-700 mb-1"
+                htmlFor="password"
+              >
+                Password
+              </label>
+
               <input
                 id="password"
                 name="password"
@@ -97,7 +120,10 @@ const Login = () => {
         <div className="text-center mt-4">
           <p className="text-sm text-slate-600">
             Don't have an account?{' '}
-            <Link to="/signup" className="font-medium text-food-orange hover:text-orange-500">
+            <Link
+              to="/signup"
+              className="font-medium text-food-orange hover:text-orange-500"
+            >
               Sign up today
             </Link>
           </p>
@@ -105,13 +131,17 @@ const Login = () => {
 
         {/* For Presentation Purposes Only */}
         <div className="mt-8 pt-6 border-t border-slate-100 text-xs text-slate-500 text-center space-y-2">
-          <p className="font-semibold text-slate-600">Presentation Test Accounts</p>
+          <p className="font-semibold text-slate-600">
+            Presentation Test Accounts
+          </p>
+
           <div className="flex justify-center space-x-6">
             <div>
               <p className="font-semibold">Staff (Admin)</p>
               <p>staff@vjfoodie.com</p>
               <p>staff</p>
             </div>
+
             <div>
               <p className="font-semibold">Customer</p>
               <p>user@vjfoodie.com</p>

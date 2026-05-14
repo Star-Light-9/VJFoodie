@@ -1,12 +1,25 @@
 import { useCart } from '../context/CartContext'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
 const FALLBACK_IMAGE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect fill='%23FFF7ED' width='400' height='300'/%3E%3Ctext x='200' y='140' text-anchor='middle' font-family='sans-serif' font-size='48' fill='%23FB923C'%3E🍽️%3C/text%3E%3Ctext x='200' y='180' text-anchor='middle' font-family='sans-serif' font-size='14' fill='%23999'%3EImage unavailable%3C/text%3E%3C/svg%3E"
 
 const FoodCard = ({ item }) => {
   const { addToCart } = useCart()
 
+  const navigate = useNavigate()
+  const location = useLocation()
+  const { user } = useAuth()
+
   // Build a cart-compatible object from Supabase menu data
   const handleAddToCart = () => {
+    if (!user) {
+      navigate('/login', {
+        state: { from: location.pathname }
+      })
+      return
+    }
+
     addToCart({
       id: item.item_id,
       item_id: item.item_id,
@@ -30,11 +43,21 @@ const FoodCard = ({ item }) => {
           }}
         />
       </div>
+
       <div className="p-4">
-        <h3 className="text-xl font-bold text-food-dark mb-2">{item.item_name}</h3>
-        <p className="text-gray-600 text-sm mb-3">{item.description}</p>
+        <h3 className="text-xl font-bold text-food-dark mb-2">
+          {item.item_name}
+        </h3>
+
+        <p className="text-gray-600 text-sm mb-3">
+          {item.description}
+        </p>
+
         <div className="flex items-center justify-between">
-          <span className="text-2xl font-bold text-food-orange">₹{item.item_price}</span>
+          <span className="text-2xl font-bold text-food-orange">
+            ₹{item.item_price}
+          </span>
+
           <button
             onClick={handleAddToCart}
             className="bg-food-green hover:bg-food-green/80 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
